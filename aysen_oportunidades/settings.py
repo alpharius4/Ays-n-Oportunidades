@@ -56,7 +56,7 @@ ROOT_URLCONF = 'aysen_oportunidades.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'], # <--- cambio de ubicacion de la carpeta templastes
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

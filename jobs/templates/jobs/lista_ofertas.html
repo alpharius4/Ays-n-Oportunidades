@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block content %}
+<h2 class="mb-4 text-center">Ofertas Laborales en la Región de Aysén</h2>
+
+<div class="row">
+    {% for oferta in ofertas %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-success border-top border-3">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ oferta.titulo }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ oferta.empresa }} - {{ oferta.ubicacion }}</h6>
+                <p class="card-text">{{ oferta.descripcion|truncatewords:20 }}</p>
+
+                <hr>
+                <ul class="list-unstyled small mb-3">
+                    <li><strong>Turno:</strong> {{ oferta.tipo_turno }}</li>
+
+                    {% if oferta.es_zona_rural %}
+                        <li class="text-warning fw-bold">📍 Zona Rural Aislada</li>
+                    {% endif %}
+
+                    {% if oferta.incluye_alojamiento %}
+                        <li class="text-info fw-bold">🏠 Incluye Alojamiento</li>
+                    {% endif %}
+                </ul>
+
+                <a href="{% url 'jobs:detalle_oferta' oferta.id %}" class="btn btn-outline-success btn-sm w-100">Ver Detalles</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <p class="text-muted">Aún no hay ofertas laborales publicadas.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

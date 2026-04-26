@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        
+        <a href="{% url 'jobs:lista_ofertas' %}" class="btn btn-outline-secondary mb-4">
+            &larr; Volver a las ofertas
+        </a>
+
+        <div class="card shadow border-success border-top border-3">
+            <div class="card-body p-5">
+                <h2 class="card-title fw-bold text-success">{{ oferta.titulo }}</h2>
+                <h5 class="text-muted mb-4">{{ oferta.empresa }} | 📍 {{ oferta.ubicacion }}</h5>
+                
+                <div class="mb-4">
+                    <h5 class="fw-bold border-bottom pb-2">Descripción del Cargo</h5>
+                    <p style="white-space: pre-wrap;">{{ oferta.descripcion }}</p>
+                </div>
+
+                <div class="p-3 bg-light rounded mb-4">
+                    <h5 class="fw-bold">Condiciones Especiales (Región de Aysén)</h5>
+                    <ul class="list-unstyled mt-3 mb-0">
+                        <li class="mb-2"><strong>⏱️ Sistema de Turno:</strong> {{ oferta.tipo_turno }}</li>
+                        
+                        {% if oferta.es_zona_rural %}
+                            <li class="mb-2 text-warning fw-bold">🚜 El trabajo se desarrolla en una zona rural aislada.</li>
+                        {% endif %}
+                        
+                        {% if oferta.incluye_alojamiento %}
+                            <li class="mb-2 text-info fw-bold">🏠 La empresa provee alojamiento (Campamento/Cabaña).</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="text-muted small">
+                    Publicado el: {{ oferta.fecha_publicacion|date:"d de F, Y" }}
+                </div>
+
+                <div class="mt-4 d-grid">
+                    <button class="btn btn-success btn-lg">Postular a esta Oferta</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
