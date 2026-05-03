@@ -15,10 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include # <-- Importante importar 'include'
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Conectamos la ruta principal (vacia '') con las URLs de nuestra app 'jobs'
-    path('', include('jobs.urls')), 
+    path('', include('jobs.urls')),
+    
+    # 1. PRIMERO va nuestra ruta personalizada para el REGISTRO:
+    path('accounts/', include('accounts.urls')), 
+    
+    # 2. DESPUÉS van las rutas que trae Django de fábrica para el LOGIN:
+    path('accounts/', include('django.contrib.auth.urls')), 
 ]

@@ -104,12 +104,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-cl' # Cambia 'en-us' por 'es-cl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago' # Ya que estás ahí, aprovecha de poner la hora local
 
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -118,3 +117,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Redirecciones de Autenticación
+LOGIN_REDIRECT_URL = 'jobs:lista_ofertas'
+LOGOUT_REDIRECT_URL = 'jobs:lista_ofertas'
