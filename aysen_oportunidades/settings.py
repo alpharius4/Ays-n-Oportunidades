@@ -119,5 +119,5 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Redirecciones de Autenticación
-LOGIN_REDIRECT_URL = 'jobs:lista_ofertas'
+LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'jobs:lista_ofertas'

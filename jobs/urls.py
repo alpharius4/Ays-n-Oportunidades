@@ -5,6 +5,6 @@ app_name = 'jobs'
 
 urlpatterns = [
     path('', views.lista_ofertas, name='lista_ofertas'),
-    # Agregamos esta nueva línea para el detalle:
-    path('<int:oferta_id>/', views.detalle_oferta, name='detalle_oferta'),
+    path('crear/', views.crear_oferta, name='crear_oferta'), # ¡NUEVA RUTA AQUÍ! Debe ir antes del <int:id>
+    path('<int:id>/', views.detalle_oferta, name='detalle_oferta'),
 ]

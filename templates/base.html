@@ -18,16 +18,19 @@
                 <ul class="navbar-nav ms-auto align-items-center">
     {% if user.is_authenticated %}
         <!-- Si el usuario inició sesión -->
-        <li class="nav-item me-3 text-white">
-            Hola, <strong>{{ user.username }}</strong>
-        </li>
-        <li class="nav-item">
-            <!-- Formulario seguro para cerrar sesión en Django 5+ -->
-            <form action="{% url 'logout' %}" method="post" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
-            </form>
-        </li>
+        <li class="nav-item me-3 text-white align-self-center">
+    Hola, <strong>{{ user.username }}</strong> 
+    <span class="badge bg-light text-success ms-1">{{ user.get_rol_display }}</span>
+</li>
+<li class="nav-item me-2">
+    <a href="{% url 'accounts:dashboard' %}" class="btn btn-info btn-sm text-white fw-bold">Mi Panel</a>
+</li>
+<li class="nav-item">
+    <form action="{% url 'logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+    </form>
+</li>
     {% else %}
         <!-- Si es un visitante -->
         <li class="nav-item">

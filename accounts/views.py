@@ -1,17 +1,34 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required # ¡El nuevo guardián!
 from .forms import RegistroUsuarioForm
+from jobs.models import OfertaLaboral
 
+# --- TU VISTA DE REGISTRO ANTERIOR SE QUEDA IGUAL ---
 def registro(request):
-    # Si el usuario envió el formulario...
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user) # Iniciamos sesión automáticamente tras registrarse
-            return redirect('jobs:lista_ofertas') # Lo mandamos a ver los trabajos
+            login(request, user)
+            return redirect('accounts:dashboard') # Cambiamos a dónde va tras registrarse
     else:
-        # Si recién entró a la página, le mostramos el formulario vacío
         form = RegistroUsuarioForm()
         
     return render(request, 'registration/registro.html', {'form': form})
+
+# --- NUEVA VISTA: EL CEREBRO DEL DASHBOARD ---
+@login_required
+def dashboard(request):
+    # Si es una empresa...
+    if request.user.rol == 'empleador':
+        # Buscamos SOLO las ofertas donde el autor sea el usuario logueado
+        # y las ordenamos desde la más nueva a la más vieja
+        mis_ofertas = OfertaLaboral.objects.filter(autor=request.user).order_by('-fecha_publicacion')
+        
+        # Le enviamos esa lista al HTML
+        return render(request, 'accounts/dashboard_empleador.html', {'mis_ofertas': mis_ofertas})
+        
+    # Si es un candidato...
+    else:
+        return render(request, 'accounts/dashboard_candidato.html')

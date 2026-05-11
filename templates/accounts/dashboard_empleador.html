@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="fw-bold text-success">Panel de Empresa</h2>
+            <p class="lead">Bienvenido/a, {{ user.username }}. Aquí podrás gestionar tus ofertas laborales.</p>
+            <hr>
+            
+            <div class="mt-4 mb-4">
+                <a href="{% url 'jobs:crear_oferta' %}" class="btn btn-success btn-lg shadow-sm">
+                    + Publicar Nueva Oferta Laboral
+                </a>
+            </div>
+
+            <h4 class="fw-bold mt-5 mb-3 text-secondary">Mis Ofertas Publicadas</h4>
+
+            {% if mis_ofertas %}
+                <div class="table-responsive shadow-sm rounded">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Cargo Solicitado</th>
+                                <th>Sistema de Turno</th>
+                                <th>Fecha de Publicación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for oferta in mis_ofertas %}
+                            <tr>
+                                <td class="fw-bold">{{ oferta.titulo_cargo }}</td>
+                                <td>{{ oferta.get_sistema_turno_display }}</td>
+                                <td>{{ oferta.fecha_publicacion|date:"d M Y" }}</td>
+                                <td>
+                                    {% if oferta.estado_activa %}
+                                        <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Cerrada</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning mt-3">
+                    Aún no has publicado ninguna oferta laboral en la plataforma. ¡Haz clic en el botón verde para comenzar!
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
