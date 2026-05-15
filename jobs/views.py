@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import OfertaLaboral
 from .forms import OfertaLaboralForm
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 # --------------------------------------------------------
 # 1. VISTAS PÚBLICAS (Semana 7)
@@ -37,3 +39,17 @@ def crear_oferta(request):
         form = OfertaLaboralForm()
 
     return render(request, 'jobs/crear_oferta.html', {'form': form})
+
+
+def prueba_email(request):
+    try:
+        send_mail(
+            'Prueba de Conectividad - Aysén Oportunidades',
+            '¡Excelente noticia, Benjamín! El sistema de correos está funcionando correctamente desde Django.',
+            'tu_correo_de_estudiante@gmail.com',
+            ['tu_correo_de_estudiante@gmail.com'], # Envíatelo a ti mismo para probar
+            fail_silently=False,
+        )
+        return HttpResponse("¡Correo enviado con éxito! Revisa tu bandeja de entrada.")
+    except Exception as e:
+        return HttpResponse(f"Error al enviar: {e}")

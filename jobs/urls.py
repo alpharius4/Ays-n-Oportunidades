@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.lista_ofertas, name='lista_ofertas'),
     path('crear/', views.crear_oferta, name='crear_oferta'), # ¡NUEVA RUTA AQUÍ! Debe ir antes del <int:id>
     path('<int:id>/', views.detalle_oferta, name='detalle_oferta'),
+    #path('test-email/', views.prueba_email, name='test_email'),
 ]

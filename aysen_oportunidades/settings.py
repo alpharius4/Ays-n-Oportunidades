@@ -121,3 +121,12 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 # Redirecciones de Autenticación
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'jobs:lista_ofertas'
+
+# --- CONFIGURACIÓN DE CORREO (GMAIL) ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'saldiviabenjamin16@gmail.com' # Tu cuenta de Gmail
+EMAIL_HOST_PASSWORD = 'meow sawg yvyx qabh'         # Las 16 letras que copiaste (sin espacios)
+DEFAULT_FROM_EMAIL = 'Aysén Oportunidades <saldiviabenjain16@gmail.com>'

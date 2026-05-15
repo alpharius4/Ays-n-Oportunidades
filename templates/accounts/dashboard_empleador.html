@@ -8,9 +8,13 @@
             <p class="lead">Bienvenido/a, {{ user.username }}. Aquí podrás gestionar tus ofertas laborales.</p>
             <hr>
             
-            <div class="mt-4 mb-4">
+            <div class="mt-4 mb-4 d-flex gap-3 flex-wrap">
                 <a href="{% url 'jobs:crear_oferta' %}" class="btn btn-success btn-lg shadow-sm">
                     + Publicar Nueva Oferta Laboral
+                </a>
+                
+                <a href="{% url 'jobs:lista_ofertas' %}" class="btn btn-outline-primary btn-lg shadow-sm">
+                    🔍 Explorar Ofertas del Mercado
                 </a>
             </div>
 
