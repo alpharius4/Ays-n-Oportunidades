@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import OfertaLaboral
+from .models import OfertaLaboral, Postulacion
 from .forms import OfertaLaboralForm
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from django.contrib import messages 
+from django.conf import settings
 
 # --------------------------------------------------------
 # 1. VISTAS PÚBLICAS (Semana 7)
@@ -53,3 +55,70 @@ def prueba_email(request):
         return HttpResponse("¡Correo enviado con éxito! Revisa tu bandeja de entrada.")
     except Exception as e:
         return HttpResponse(f"Error al enviar: {e}")
+
+
+# ==============================================================================
+# MOTOR DE POSTULACIONES: Procesa la solicitud y notifica al empleador por Gmail
+# ==============================================================================
+
+
+@login_required
+def postular_oferta(request, id):
+    oferta = get_object_or_404(OfertaLaboral, id=id)
+    
+    # 1. Filtro de seguridad: Solo los candidatos pueden postular
+    if request.user.rol != 'candidato':
+        messages.error(request, "Las empresas no pueden postular a ofertas.")
+        return redirect('jobs:detalle_oferta', id=id)
+        
+    # 2. Verificar si el usuario ya postuló antes
+    if Postulacion.objects.filter(oferta=oferta, candidato=request.user).exists():
+        messages.warning(request, "Ya has postulado a esta oferta anteriormente.")
+        return redirect('jobs:detalle_oferta', id=id)
+        
+    # 3. Procesar la postulación al hacer clic en el botón (método POST)
+    if request.method == 'POST':
+        # Guardamos el registro en la base de datos
+        Postulacion.objects.create(oferta=oferta, candidato=request.user)
+        
+        # 4. Magia de Gmail: Notificamos al empleador
+        try:
+            send_mail(
+                subject=f'Nueva postulación: {oferta.titulo_cargo}',
+                message=f'Hola {oferta.autor.username},\n\n'
+                        f'El candidato {request.user.username} ha postulado a tu oferta "{oferta.titulo_cargo}" '
+                        f'en Aysén Oportunidades.\n\n'
+                        f'Puedes revisar su perfil entrando a tu panel de empresa.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[oferta.autor.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Si hay un error con internet o el correo, la postulación se guarda igual
+            print(f"Error al enviar correo: {e}") 
+            
+        messages.success(request, "¡Postulación enviada con éxito! El empleador ha sido notificado.")
+        return redirect('accounts:dashboard')
+        
+    return redirect('jobs:detalle_oferta', id=id)
+
+# ==============================================================================
+# VER POSTULANTES: Muestra a la empresa quiénes postularon a su aviso
+# ==============================================================================
+
+@login_required
+def ver_postulantes(request, id):
+    oferta = get_object_or_404(OfertaLaboral, id=id)
+    
+    # Filtro de seguridad: Solo el creador de la oferta puede ver los CVs
+    if request.user != oferta.autor:
+        messages.error(request, "No tienes permiso para ver los candidatos de esta oferta.")
+        return redirect('accounts:dashboard')
+        
+    # Traemos todas las postulaciones de esta oferta en específico
+    postulaciones = Postulacion.objects.filter(oferta=oferta)
+    
+    return render(request, 'jobs/ver_postulantes.html', {
+        'oferta': oferta,
+        'postulaciones': postulaciones
+    })

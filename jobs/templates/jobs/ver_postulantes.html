@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        
+        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary mb-4 shadow-sm">
+            ← Volver a Mi Panel
+        </a>
+
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body bg-light rounded">
+                <h3 class="fw-bold text-success mb-1">Candidatos para: {{ oferta.titulo_cargo }}</h3>
+                <p class="text-muted mb-0">Publicado el {{ oferta.fecha_publicacion|date:"d de F, Y" }}</p>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-3">Lista de Postulantes ({{ postulaciones.count }})</h5>
+        
+        {% if postulaciones %}
+            <div class="table-responsive shadow-sm rounded">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Nombre de Usuario</th>
+                            <th>Correo de Contacto</th>
+                            <th>Fecha de Postulación</th>
+                            <th>Estado Actual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for postulacion in postulaciones %}
+                        <tr>
+                            <td class="fw-bold">{{ postulacion.candidato.username }}</td>
+                            <td>
+                                <a href="mailto:{{ postulacion.candidato.email }}" class="text-decoration-none">
+                                    ✉️ {{ postulacion.candidato.email }}
+                                </a>
+                            </td>
+                            <td>{{ postulacion.fecha_postulacion|date:"d M Y - H:i" }}</td>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ postulacion.get_estado_display }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info shadow-sm">
+                Aún no hay candidatos para esta oferta laboral.
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

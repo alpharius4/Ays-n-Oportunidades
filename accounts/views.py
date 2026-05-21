@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required # ¡El nuevo guardián!
 from .forms import RegistroUsuarioForm
-from jobs.models import OfertaLaboral
+from jobs.models import OfertaLaboral, Postulacion
 
 # --- TU VISTA DE REGISTRO ANTERIOR SE QUEDA IGUAL ---
 def registro(request):
@@ -31,4 +31,8 @@ def dashboard(request):
         
     # Si es un candidato...
     else:
-        return render(request, 'accounts/dashboard_candidato.html')
+        # Buscamos SOLO las postulaciones de este usuario, ordenadas por la más reciente
+        mis_postulaciones = Postulacion.objects.filter(candidato=request.user).order_by('-fecha_postulacion')
+        
+        # Le enviamos la lista al HTML
+        return render(request, 'accounts/dashboard_candidato.html', {'mis_postulaciones': mis_postulaciones})

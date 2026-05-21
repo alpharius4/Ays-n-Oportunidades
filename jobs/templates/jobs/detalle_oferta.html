@@ -42,10 +42,13 @@
     {% if user.is_authenticated %}
         
         {% if user.rol == 'candidato' %}
-            <button class="btn btn-success btn-lg fw-bold shadow-sm">
-                ✉️ Postular a esta Oferta
-            </button>
             
+            <form action="{% url 'jobs:postular_oferta' oferta.id %}" method="POST" class="d-grid">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
+                    ✉️ Postular a esta Oferta
+                </button>
+            </form>
         {% elif user.rol == 'empleador' %}
             <button class="btn btn-secondary btn-lg" disabled>
                 Las empresas no pueden postular a ofertas
