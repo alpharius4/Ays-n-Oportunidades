@@ -19,24 +19,27 @@
                     <p style="white-space: pre-wrap;">{{ oferta.descripcion|default:"Sin descripción detallada disponible." }}</p>
                 </div>
 
-                <div class="p-3 bg-light rounded mb-4">
-                    <h5 class="fw-bold">Condiciones Especiales (Región de Aysén)</h5>
-                    <ul class="list-unstyled mt-3 mb-0">
-                        <li class="mb-2"><strong>⏱️ Sistema de Turno:</strong> {{ oferta.get_sistema_turno_display }}</li>
-                        
-                        {% if oferta.es_zona_rural %}
-                            <li class="mb-2 text-warning fw-bold">🚜 El trabajo se desarrolla en una zona rural aislada.</li>
+                <div class="card bg-light border-0 p-3 mb-4 rounded">
+                    <h5 class="mb-3 fw-bold">Condiciones Especiales (Región de Aysén)</h5>
+                    <ul class="list-unstyled mb-0">
+        
+                        {% if oferta.sueldo %}
+                        <li class="mb-2">💰 <strong>Sueldo Ofrecido:</strong> ${{ oferta.sueldo }} líquidos</li>
                         {% endif %}
-                        
+
+                        <li class="mb-2">⏱️ <strong>Sistema de Turno:</strong> {{ oferta.sistema_turnos }}</li>
+        
+                        {% if oferta.es_rural %}
+                        <li class="text-success mb-2">🌲 <strong>Sector Rural:</strong> Sí, la oferta se desarrolla en zona rural.</li>
+                        {% endif %}
+
                         {% if oferta.incluye_alojamiento %}
-                            <li class="mb-2 text-info fw-bold">🏠 La empresa provee alojamiento (Campamento/Cabaña).</li>
+                        <li class="text-info">🏠 <strong>Alojamiento:</strong> La empresa provee alojamiento (Campamento/Cabaña).</li>
                         {% endif %}
-                    </ul>
+                        </ul>
                 </div>
 
-                <div class="text-muted small">
-                    Publicado el: {{ oferta.fecha_publicacion|date:"d de F, Y" }}
-                </div>
+                <p class="text-muted small mb-4">Publicado el: {{ oferta.fecha_publicacion|date:"d \d\e F, Y" }}</p>
 
                 <div class="mt-4 d-grid">
     {% if user.is_authenticated %}

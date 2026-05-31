@@ -1,25 +1,63 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="container mt-5">
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow border-0 border-success border-top border-3">
-                <div class="card-header bg-white py-3">
-                    <h4 class="mb-0 fw-bold text-success">Publicar Nueva Oferta Laboral</h4>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Publicar Nueva Oferta Laboral</h4>
                 </div>
                 <div class="card-body p-4">
                     
-                    <form method="post">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
                         {% csrf_token %}
-                        {{ form.as_p }}
                         
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary fw-bold">Cancelar</a>
-                            <button type="submit" class="btn btn-success fw-bold">Publicar Empleo</button>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título del Cargo</label>
+                            {{ form.titulo_cargo }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Descripción del trabajo</label>
+                            {{ form.descripcion }}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Sueldo Ofrecido ($)</label>
+                                {{ form.sueldo }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Sistema de Turnos</label>
+                                {{ form.sistema_turnos }}
+                            </div>
+                        </div>
+
+                        <div class="card bg-light border-info p-3 mb-4">
+                            <p class="mb-2 fw-bold text-info">Condiciones Logísticas (Zona Extrema)</p>
+                            
+                            <div class="form-check form-switch mb-2">
+                                {{ form.es_rural }}
+                                <label class="form-check-label fw-semibold">El trabajo es en sector rural</label>
+                            </div>
+                            
+                            <div class="form-check form-switch">
+                                {{ form.incluye_alojamiento }}
+                                <label class="form-check-label fw-semibold">La oferta incluye alojamiento/campamento</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Publicar Oferta</button>
+                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
                         </div>
                     </form>
-
+                    
                 </div>
             </div>
         </div>

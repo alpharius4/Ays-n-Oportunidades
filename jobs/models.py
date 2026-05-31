@@ -1,29 +1,37 @@
 from django.db import models
-from django.conf import settings
+from django.conf import settings # Para conectar con tu usuario
 
 class OfertaLaboral(models.Model):
-    TURNOS = (
-        ('14x14', '14x14'),
-        ('10x10', '10x10'),
-        ('7x7', '7x7'),
-        ('5x2', '5x2'),
-        ('sin_turno', 'Lunes a Viernes'),
-    )
+    # Relación con el usuario (Empresa) que crea la oferta
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ofertas_publicadas')
     
-    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    titulo_cargo = models.CharField(max_length=150)
-    sistema_turno = models.CharField(max_length=20, choices=TURNOS)
+    # Datos generales del cargo
+    titulo_cargo = models.CharField(max_length=200, verbose_name="Título del Cargo")
+    descripcion = models.TextField(verbose_name="Descripción del trabajo")
+    sueldo = models.IntegerField(verbose_name="Sueldo líquido", null=True, blank=True)
     
-    incluye_alojamiento = models.BooleanField(default=False)
-    es_zona_rural = models.BooleanField(default=False)
+    # Opciones de turnos para Aysén
+    OPCIONES_TURNOS = [
+        ('Lunes a Viernes', 'Jornada Normal (L a V)'),
+        ('14x14', 'Turno 14x14'),
+        ('7x7', 'Turno 7x7'),
+        ('20x10', 'Turno 20x10'),
+        ('Otro', 'Otro sistema de turnos'),
+    ]
+    sistema_turnos = models.CharField(max_length=50, choices=OPCIONES_TURNOS, default='Lunes a Viernes')
     
-    estado_activa = models.BooleanField(default=True)
+    # Filtros logísticos regionales
+    es_rural = models.BooleanField(default=False, verbose_name="Sector Rural")
+    incluye_alojamiento = models.BooleanField(default=False, verbose_name="Incluye Alojamiento/Campamento")
+    
+    # Metadatos automáticos
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
+    activa = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.titulo_cargo} - {self.get_sistema_turno_display()}"
-    
-# ... (Tu modelo OfertaLaboral se queda arriba tal cual está) ...
+        return f"{self.titulo_cargo} - {self.autor.username}"
+
+
 
 class Postulacion(models.Model):
     ESTADOS_POSTULACION = [

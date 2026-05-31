@@ -28,6 +28,7 @@ def detalle_oferta(request, id):
 def crear_oferta(request):
     # Medida de seguridad: Solo Empleadores pueden crear ofertas
     if request.user.rol != 'empleador':
+        messages.error(request, "Solo las empresas pueden publicar ofertas.")
         return redirect('jobs:lista_ofertas')
 
     if request.method == 'POST':
@@ -36,25 +37,29 @@ def crear_oferta(request):
             oferta = form.save(commit=False)
             oferta.autor = request.user  # Asignamos la empresa que la creó
             oferta.save() 
+            
+            # --- MAGIA DE GMAIL: Correo de confirmación a la empresa ---
+            try:
+                send_mail(
+                    subject=f'¡Oferta Publicada con Éxito! - {oferta.titulo_cargo}',
+                    message=f'Hola {request.user.username},\n\n'
+                            f'Tu aviso para "{oferta.titulo_cargo}" ha sido publicado correctamente en Aysén Oportunidades.\n'
+                            f'Los trabajadores locales ya pueden verla y enviarte postulaciones.\n\n'
+                            f'Gracias por aportar al empleo en la región.',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[request.user.email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"Error al enviar correo de creación de oferta: {e}")
+            # -----------------------------------------------------------
+
+            messages.success(request, "¡Tu oferta ha sido publicada con éxito!")
             return redirect('accounts:dashboard')
     else:
         form = OfertaLaboralForm()
 
     return render(request, 'jobs/crear_oferta.html', {'form': form})
-
-
-def prueba_email(request):
-    try:
-        send_mail(
-            'Prueba de Conectividad - Aysén Oportunidades',
-            '¡Excelente noticia, Benjamín! El sistema de correos está funcionando correctamente desde Django.',
-            'tu_correo_de_estudiante@gmail.com',
-            ['tu_correo_de_estudiante@gmail.com'], # Envíatelo a ti mismo para probar
-            fail_silently=False,
-        )
-        return HttpResponse("¡Correo enviado con éxito! Revisa tu bandeja de entrada.")
-    except Exception as e:
-        return HttpResponse(f"Error al enviar: {e}")
 
 
 # ==============================================================================
@@ -122,3 +127,19 @@ def ver_postulantes(request, id):
         'oferta': oferta,
         'postulaciones': postulaciones
     })
+
+
+
+
+def prueba_email(request):
+    try:
+        send_mail(
+            subject='Prueba de Conectividad - Aysén Oportunidades',
+            message='¡Excelente noticia, Benjamín! El sistema de correos de Django está configurado y funcionando perfectamente con Gmail.',
+            from_email=settings.DEFAULT_FROM_EMAIL, # Este es el correo "Cartero" de settings.py
+            recipient_list=['saldiviabenjamin16@gmail.com'], # <-- ¡Cambia esto por tu Gmail de uso diario!
+            fail_silently=False,
+        )
+        return HttpResponse("¡Correo enviado con éxito! Revisa tu bandeja de entrada en el celular o PC.")
+    except Exception as e:
+        return HttpResponse(f"Error al enviar el correo. El sistema dice: {e}")
