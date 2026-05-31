@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:id>/postular/', views.postular_oferta, name='postular_oferta'),
     path('<int:id>/postulantes/', views.ver_postulantes, name='ver_postulantes'),
     path('test-email/', views.prueba_email, name='test_email'),
+    path('postulacion/<int:postulacion_id>/estado/<str:nuevo_estado>/', views.cambiar_estado_postulacion, name='cambiar_estado_postulacion'),
 ]

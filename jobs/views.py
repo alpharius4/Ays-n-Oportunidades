@@ -128,8 +128,9 @@ def ver_postulantes(request, id):
         'postulaciones': postulaciones
     })
 
-
-
+# ==============================================================================
+# pruebas de gmails para notificar al empleador 
+# ==============================================================================
 
 def prueba_email(request):
     try:
@@ -143,3 +144,69 @@ def prueba_email(request):
         return HttpResponse("¡Correo enviado con éxito! Revisa tu bandeja de entrada en el celular o PC.")
     except Exception as e:
         return HttpResponse(f"Error al enviar el correo. El sistema dice: {e}")
+
+# ==============================================================================
+# VER POSTULANTES: Muestra a la empresa quiénes postularon a su aviso
+# ==============================================================================
+
+@login_required
+def cambiar_estado_postulacion(request, postulacion_id, nuevo_estado):
+    # Buscamos la postulación específica
+    postulacion = get_object_or_404(Postulacion, id=postulacion_id)
+    
+    # Filtro de seguridad: Solo el autor de la oferta puede cambiar los estados
+    if request.user != postulacion.oferta.autor:
+        messages.error(request, "No tienes permiso para modificar esta postulación.")
+        return redirect('accounts:dashboard')
+        
+    estados_validos = ['pendiente', 'revision', 'aceptado', 'rechazado']
+    
+    if nuevo_estado in estados_validos:
+        postulacion.estado = nuevo_estado
+        postulacion.save()
+        messages.success(request, f"Candidato {postulacion.candidato.username} marcado como {nuevo_estado.upper()}.")
+        
+        # ====================================================================
+        # MAGIA DE GMAIL: Notificar al candidato según la decisión de la empresa
+        # ====================================================================
+        asunto = f"Actualización de tu postulación: {postulacion.oferta.titulo_cargo}"
+        mensaje = ""
+
+        # Redactamos un mensaje distinto dependiendo del botón que apretó la empresa
+        if nuevo_estado == 'aceptado':
+            mensaje = (
+                f"¡Felicidades {postulacion.candidato.username}!\n\n"
+                f"La empresa {postulacion.oferta.autor.username} ha ACEPTADO tu postulación "
+                f"para el cargo de '{postulacion.oferta.titulo_cargo}'.\n\n"
+                f"Pronto se pondrán en contacto directo contigo al correo que registraste."
+            )
+        elif nuevo_estado == 'rechazado':
+            mensaje = (
+                f"Hola {postulacion.candidato.username},\n\n"
+                f"Agradecemos mucho tu interés en el cargo de '{postulacion.oferta.titulo_cargo}'.\n"
+                f"Lamentablemente, en esta ocasión la empresa ha decidido avanzar con otros perfiles.\n\n"
+                f"¡Te deseamos mucho éxito en tus futuras búsquedas en Aysén Oportunidades!"
+            )
+        elif nuevo_estado == 'revision':
+            mensaje = (
+                f"Hola {postulacion.candidato.username},\n\n"
+                f"Te informamos que tu currículum para el cargo de '{postulacion.oferta.titulo_cargo}' "
+                f"ha pasado a la etapa de REVISIÓN.\n\n"
+                f"La empresa está evaluando tu perfil detalladamente. Te notificaremos ante cualquier cambio."
+            )
+
+        # Si hay un mensaje redactado (es decir, no es 'pendiente'), enviamos el correo
+        if mensaje:
+            try:
+                send_mail(
+                    subject=asunto,
+                    message=mensaje,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[postulacion.candidato.email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"Error al enviar correo al candidato: {e}")
+        # ====================================================================
+        
+    return redirect('jobs:ver_postulantes', id=postulacion.oferta.id)
