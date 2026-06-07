@@ -6,13 +6,47 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.contrib import messages 
 from django.conf import settings
+from django.db.models import Q
 
 # --------------------------------------------------------
-# 1. VISTAS PÚBLICAS (Semana 7)
+# 1. VISTAS PÚBLICAS (Semana 7) y Cambio para el buscador de la semana 12 ( solo la de lista_ofertas la de detalle_oferta sigue igual)
 # --------------------------------------------------------
 def lista_ofertas(request):
-    # Traemos todas las ofertas de la base de datos
-    ofertas = OfertaLaboral.objects.all() 
+    # Por defecto, traemos todas las ofertas activas, de la más nueva a la más vieja
+    ofertas = OfertaLaboral.objects.filter(activa=True).order_by('-fecha_publicacion')
+    
+    # =====================================================================
+    # NUEVA MAGIA: Ocultar ofertas a las que el usuario ya postuló
+    # =====================================================================
+    if request.user.is_authenticated:
+        # 1. Buscamos todas las postulaciones de este usuario y sacamos solo los IDs de esas ofertas
+        ofertas_postuladas = Postulacion.objects.filter(candidato=request.user).values_list('oferta_id', flat=True)
+        
+        # 2. Le decimos a Django que "excluya" de la lista principal esas ofertas específicas
+        ofertas = ofertas.exclude(id__in=ofertas_postuladas)
+    # =====================================================================
+
+    # Capturamos los datos que el usuario envía por la URL (Buscador y Filtros)
+    query_texto = request.GET.get('q')
+    filtro_rural = request.GET.get('es_rural')
+    filtro_turno = request.GET.get('sistema_turnos')
+
+    # Aplicamos el buscador de texto (Busca en título o en la descripción)
+    if query_texto:
+        ofertas = ofertas.filter(
+            Q(titulo_cargo__icontains=query_texto) | 
+            Q(descripcion__icontains=query_texto)
+        )
+    
+    # Aplicamos el filtro de Ruralidad (Checkbox)
+    if filtro_rural == 'on':
+        ofertas = ofertas.filter(es_rural=True)
+        
+    # Aplicamos el filtro de Turnos (Menú desplegable)
+    if filtro_turno:
+        ofertas = ofertas.filter(sistema_turnos=filtro_turno)
+
+    # Enviamos las ofertas filtradas (y limpias de postulaciones previas) al HTML
     return render(request, 'jobs/lista_ofertas.html', {'ofertas': ofertas})
 
 def detalle_oferta(request, id):

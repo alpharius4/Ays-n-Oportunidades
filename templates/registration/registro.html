@@ -1,26 +1,80 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow border-0 border-warning border-top border-3">
-            <div class="card-header bg-white text-center py-3">
-                <h4 class="mb-0 fw-bold text-warning">Crear una Cuenta</h4>
-            </div>
-            <div class="card-body p-4">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-5">
+            
+            <!-- Tarjeta de Registro -->
+            <div class="card shadow-lg border-0 rounded-4">
                 
-                <form method="post">
-                    {% csrf_token %}
+                <!-- Encabezado -->
+                <div class="card-header bg-primary text-white text-center py-4 rounded-top-4 border-0">
+                    <h3 class="fw-bold mb-0">Únete a la Plataforma</h3>
+                    <p class="mb-0 text-white-50 small mt-1">Encuentra o publica oportunidades en Aysén</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-light">
                     
-                    <!-- Django renderizará los campos (usuario, email, contraseña y ROL) mágicamente -->
-                    {{ form.as_p }}
+                    <!-- ========================================== -->
+                    <!-- CAJA DE ADVERTENCIAS (Errores de validación) -->
+                    <!-- ========================================== -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger shadow-sm mb-4 border-0 border-start border-danger border-4">
+                            <h6 class="fw-bold mb-2 text-danger">⚠️ No pudimos crear tu cuenta:</h6>
+                            <ul class="mb-0 small text-danger">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <!-- ========================================== -->
 
-                    <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Completar Registro</button>
-                </form>
+                    <!-- Formulario -->
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-bold text-secondary">
+                                {{ field.label }}
+                            </label>
+                            
+                            {{ field }} <!-- Aquí se inyectan las cajas de texto con Bootstrap -->
+                            
+                            <!-- Textos de ayuda (ej: "Tu contraseña debe tener 8 caracteres") -->
+                            {% if field.help_text %}
+                                <div class="form-text small text-muted mt-1">
+                                    {{ field.help_text|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm rounded-3">
+                                Crear mi Cuenta
+                            </button>
+                        </div>
+                    </form>
+                </div>
                 
-            </div>
-            <div class="card-footer text-center bg-light py-3">
-                <small class="text-muted">¿Ya tienes cuenta? <a href="{% url 'login' %}" class="text-warning fw-bold">Inicia sesión</a></small>
+                <!-- Pie de tarjeta (Redirección al Login) -->
+                <div class="card-footer text-center py-4 bg-white border-0 rounded-bottom-4">
+                    <p class="text-muted mb-0">
+                        ¿Ya tienes una cuenta? <br>
+                        <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">
+                            Iniciar Sesión aquí
+                        </a>
+                    </p>
+                </div>
+                
             </div>
         </div>
     </div>

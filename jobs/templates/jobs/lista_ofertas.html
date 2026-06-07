@@ -1,36 +1,86 @@
-{% extends 'base.html' %} {% block content %}
-<h2 class="mb-4 text-center">Ofertas Laborales en la Región de Aysén</h2>
+{% extends 'base.html' %}
 
-<div class="row">
-    {% for oferta in ofertas %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm border-success border-top border-3">
-            <div class="card-body">
-                <h5 class="card-title text-success fw-bold">{{ oferta.titulo_cargo }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ oferta.empresa }} - {{ oferta.ubicacion }}</h6>
-                <p class="card-text">{{ oferta.descripcion|truncatewords:20 }}</p>
-
-                <hr>
-                <ul class="list-unstyled small mb-3">
-                    <li><strong>Turno:</strong> {{ oferta.tipo_turno }}</li>
-
-                    {% if oferta.es_zona_rural %}
-                        <li class="text-warning fw-bold">📍 Zona Rural Aislada</li>
-                    {% endif %}
-
-                    {% if oferta.incluye_alojamiento %}
-                        <li class="text-info fw-bold">🏠 Incluye Alojamiento</li>
-                    {% endif %}
-                </ul>
-
-                <a href="{% url 'jobs:detalle_oferta' oferta.id %}" class="btn btn-outline-success btn-sm w-100">Ver Detalles</a>
-            </div>
+{% block content %}
+<div class="container mt-5 mb-5">
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary">Oportunidades Laborales</h2>
+            <p class="text-muted">Encuentra el trabajo que se adapta a tu estilo de vida en la región.</p>
         </div>
     </div>
-    {% empty %}
-    <div class="col-12 text-center">
-        <p class="text-muted">Aún no hay ofertas laborales publicadas.</p>
+
+    <div class="row">
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">🔍 Filtrar Búsqueda</h5>
+                    
+                    <form method="GET" action="{% url 'jobs:lista_ofertas' %}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Palabra Clave</label>
+                            <input type="text" name="q" class="form-control" placeholder="Ej: Programador, Nodo..." value="{{ request.GET.q }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Sistema de Turnos</label>
+                            <select name="sistema_turnos" class="form-select">
+                                <option value="">Todos los turnos</option>
+                                <option value="Lunes a Viernes" {% if request.GET.sistema_turnos == 'Lunes a Viernes' %}selected{% endif %}>Lunes a Viernes</option>
+                                <option value="Turno 7x7" {% if request.GET.sistema_turnos == 'Turno 7x7' %}selected{% endif %}>Turno 7x7</option>
+                                <option value="Turno 14x14" {% if request.GET.sistema_turnos == 'Turno 14x14' %}selected{% endif %}>Turno 14x14</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="es_rural" id="ruralCheck" {% if request.GET.es_rural == 'on' %}checked{% endif %}>
+                            <label class="form-check-label small" for="ruralCheck">
+                                🌲 Solo Sector Rural
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                            <a href="{% url 'jobs:lista_ofertas' %}" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 col-lg-9">
+            
+            {% if ofertas %}
+                <div class="row">
+                {% for oferta in ofertas %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm h-100 border-0">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-success">{{ oferta.titulo_cargo }}</h5>
+                                <p class="card-text text-muted small mb-2">🏢 Empresa: {{ oferta.autor.username }}</p>
+                                
+                                <div class="mb-3">
+                                    <span class="badge bg-light text-dark border">⏱️ {{ oferta.sistema_turnos|default:"Sin turno definido" }}</span>
+                                    {% if oferta.es_rural %}
+                                        <span class="badge bg-success">🌲 Rural</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <a href="{% url 'jobs:detalle_oferta' oferta.id %}" class="btn btn-outline-primary btn-sm w-100">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning shadow-sm border-0 text-center py-5">
+                    <h4 class="fw-bold mb-3">No encontramos ofertas 🕵️‍♂️</h4>
+                    <p class="mb-0">Intenta buscar con otras palabras o limpia los filtros para ver todas las opciones.</p>
+                </div>
+            {% endif %}
+
+        </div>
     </div>
-    {% endfor %}
 </div>
 {% endblock %}
