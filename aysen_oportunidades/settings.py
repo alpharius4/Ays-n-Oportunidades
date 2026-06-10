@@ -80,10 +80,15 @@ WSGI_APPLICATION = 'aysen_oportunidades.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+if os.environ.get('FLY_APP_NAME'):
+    ruta_bd = '/data/db.sqlite3'
+else:
+    ruta_bd = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': ruta_bd,
     }
 }
 
