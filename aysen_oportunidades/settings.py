@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Carga las variables del archivo .env
 load_dotenv()
@@ -80,17 +81,22 @@ WSGI_APPLICATION = 'aysen_oportunidades.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-if os.environ.get('FLY_APP_NAME'):
-    ruta_bd = '/data/db.sqlite3'
-else:
-    ruta_bd = BASE_DIR / 'db.sqlite3'
-
+# Mantenemos SQLite por defecto para desarrollo local
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ruta_bd,
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Si detecta que estamos en Producción (Render) y hay una URL de BD, usa PostgreSQL
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 
 # Password validation
