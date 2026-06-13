@@ -50,14 +50,25 @@
                                 </td>
                                 
                                 <td>
-                                    <a href="{% url 'jobs:detalle_oferta' oferta.id %}" class="btn btn-sm btn-outline-secondary mb-1">
-                                        Ver Aviso
-                                    </a>
-                                    
-                                    <a href="{% url 'jobs:ver_postulantes' oferta.id %}" class="btn btn-sm btn-success shadow-sm mb-1">
-                                        Revisar CVs
-                                    </a>
-                                </td>
+                                <a href="{% url 'jobs:detalle_oferta' oferta.id %}" class="btn btn-sm btn-outline-secondary mb-1">
+                                Ver Aviso
+                                </a>
+    
+                                <a href="{% url 'jobs:ver_postulantes' oferta.id %}" class="btn btn-sm btn-success shadow-sm mb-1">
+                                Revisar CVs
+                                </a>
+
+                                <form action="{% url 'jobs:toggle_estado_oferta' oferta.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                                <button type="submit" class="btn btn-sm mb-1 shadow-sm {% if oferta.activa %}btn-danger{% else %}btn-warning{% endif %}">
+                            {% if oferta.activa %} 
+                                👁️ Ocultar
+                            {% else %} 
+                            ✅ Reactivar
+                            {% endif %}
+                            </button>
+                            </form>
+                            </td>
                             </tr>
                             {% endfor %}
                         </tbody>

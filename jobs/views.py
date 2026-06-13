@@ -244,3 +244,20 @@ def cambiar_estado_postulacion(request, postulacion_id, nuevo_estado):
         # ====================================================================
         
     return redirect('jobs:ver_postulantes', id=postulacion.oferta.id)
+
+        # ====================================================================
+        # para ocultar las ofertas laborales en el empleador
+        # ====================================================================
+
+@login_required
+def toggle_estado_oferta(request, oferta_id):
+    # Usamos 'autor' porque así lo llamaste en tu modelo
+    oferta = get_object_or_404(OfertaLaboral, id=oferta_id, autor=request.user)
+    
+    if request.method == 'POST':
+        oferta.activa = not oferta.activa
+        oferta.save()
+        
+    # Cambia 'mis_ofertas' por el nombre de la vista donde el empleador ve sus publicaciones
+    # Te devuelve a la página anterior. Si por algún motivo falla, te manda a tu dashboard por defecto.
+    return redirect(request.META.get('HTTP_REFERER', '/accounts/dashboard/'))
