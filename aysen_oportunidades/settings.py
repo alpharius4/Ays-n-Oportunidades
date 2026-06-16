@@ -147,5 +147,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'aysenoportunidades@gmail.com') # Tu cuenta de Gmail
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'toex zrsp utah hlsr')       # Las 16 letras que copiaste (sin espacios)
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'toexzrsputahhlsr')       # Las 16 letras que copiaste (sin espacios)
 DEFAULT_FROM_EMAIL = 'Aysén Oportunidades <aysenoportunidades@gmail.com>'
