@@ -141,11 +141,18 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'jobs:lista_ofertas'
 
-# --- CONFIGURACIÓN DE CORREO (GMAIL) ---
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'aysenoportunidades@gmail.com') # Tu cuenta de Gmail
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'toexzrsputahhlsr')       # Las 16 letras que copiaste (sin espacios)
+# --- CONFIGURACIÓN DE CORREO ---
 DEFAULT_FROM_EMAIL = 'Aysén Oportunidades <aysenoportunidades@gmail.com>'
+
+# Si detecta que estamos en Producción (Render) gracias a la variable DATABASE_URL
+if os.environ.get("DATABASE_URL"):
+    # Evita el bloqueo del puerto gratuito imprimiendo el correo en los Logs de Render
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # En tu PC local (desarrollo), enviará el correo real por Gmail
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'aysenoportunidades@gmail.com')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'toexzrsputahhlsr')       # Las 16 letras que copiaste (sin espacios)
