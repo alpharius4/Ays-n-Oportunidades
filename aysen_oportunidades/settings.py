@@ -156,3 +156,10 @@ else:
     EMAIL_USE_TLS = True
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'aysenoportunidades@gmail.com')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'toexzrsputahhlsr')       # Las 16 letras que copiaste (sin espacios)
+
+
+# URL pública por la que se accederá a los archivos en el navegador
+MEDIA_URL = '/media/'
+
+# Carpeta física en tu computador donde se guardarán los PDFs/Word
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -57,7 +57,14 @@ class Postulacion(models.Model):
         choices=ESTADOS_POSTULACION, 
         default='pendiente'
     )
-
+    
+    # 🆕 AGREGA ESTA LÍNEA AQUÍ AL FINAL:
+    cv_archivo = models.FileField(
+        upload_to='cvs_candidatos/', 
+        verbose_name="Currículum (PDF/Word)", 
+        null=True, 
+        blank=True
+    )
     class Meta:
         # Esto es clave: evita que un mismo candidato postule dos veces a la misma oferta
         unique_together = ('oferta', 'candidato')

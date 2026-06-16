@@ -106,7 +106,7 @@ def crear_oferta(request):
 
 
 # ==============================================================================
-# MOTOR DE POSTULACIONES: Procesa la solicitud y notifica al empleador por Gmail
+# MOTOR DE POSTULACIONES: Procesa la solicitud y notifica al empleador por Gmail y ahora que pueda recibir archivos
 # ==============================================================================
 
 
@@ -126,17 +126,24 @@ def postular_oferta(request, id):
         
     # 3. Procesar la postulación al hacer clic en el botón (método POST)
     if request.method == 'POST':
-        # Guardamos el registro en la base de datos
-        Postulacion.objects.create(oferta=oferta, candidato=request.user)
+        # CAPTURAMOS EL ARCHIVO FÍSICO DESDE EL FORMULARIO HTML
+        archivo_cv = request.FILES.get('cv_archivo')
         
-        # 4. Magia de Gmail: Notificamos al empleador
+        # Guardamos el registro en la base de datos incluyendo el archivo
+        Postulacion.objects.create(
+            oferta=oferta, 
+            candidato=request.user,
+            cv_archivo=archivo_cv  # <-- Asegúrate de que se llame así en tu models.py
+        )
+        
+        # 4. Magia de Gmail: Notificamos al empleador (Consola en Render / SMTP local)
         try:
             send_mail(
                 subject=f'Nueva postulación: {oferta.titulo_cargo}',
                 message=f'Hola {oferta.autor.username},\n\n'
                         f'El candidato {request.user.username} ha postulado a tu oferta "{oferta.titulo_cargo}" '
                         f'en Aysén Oportunidades.\n\n'
-                        f'Puedes revisar su perfil entrando a tu panel de empresa.',
+                        f'Puedes revisar su perfil y descargar su CV entrando a tu panel de empresa.',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[oferta.autor.email],
                 fail_silently=False,
@@ -145,7 +152,7 @@ def postular_oferta(request, id):
             # Si hay un error con internet o el correo, la postulación se guarda igual
             print(f"Error al enviar correo: {e}") 
             
-        messages.success(request, "¡Postulación enviada con éxito! El empleador ha sido notificado.")
+        messages.success(request, "¡Postulación enviada con éxito! Tu currículum ha sido cargado en el sistema.")
         return redirect('accounts:dashboard')
         
     return redirect('jobs:detalle_oferta', id=id)
@@ -289,3 +296,8 @@ def despostular_a_oferta(request, id):
             messages.error(request, 'No estás postulado a esta oferta.')
             
     return redirect(request.META.get('HTTP_REFERER', 'jobs:lista_ofertas'))
+
+        # ====================================================================
+        # funcion para recibir un archivo
+        # ====================================================================
+

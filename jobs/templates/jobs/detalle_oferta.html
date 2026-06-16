@@ -36,34 +36,60 @@
                         {% if oferta.incluye_alojamiento %}
                         <li class="text-info">🏠 <strong>Alojamiento:</strong> La empresa provee alojamiento (Campamento/Cabaña).</li>
                         {% endif %}
-                        </ul>
+                    </ul>
                 </div>
 
                 <p class="text-muted small mb-4">Publicado el: {{ oferta.fecha_publicacion|date:"d \d\e F, Y" }}</p>
 
                 <div class="mt-4 d-grid">
-    {% if user.is_authenticated %}
-        
-        {% if user.rol == 'candidato' %}
-            
-            <form action="{% url 'jobs:postular_oferta' oferta.id %}" method="POST" class="d-grid">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
-                    ✉️ Postular a esta Oferta
-                </button>
-            </form>
-        {% elif user.rol == 'empleador' %}
-            <button class="btn btn-secondary btn-lg" disabled>
-                Las empresas no pueden postular a ofertas
-            </button>
-        {% endif %}
-        
-    {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg fw-bold">
-            Inicia sesión como Candidato para postular
-        </a>
-    {% endif %}
-</div>
+                    {% if user.is_authenticated %}
+                        
+                        {% if user.rol == 'candidato' %}
+                            
+                            {% if ya_postulado %}
+                                <div class="alert alert-info shadow-sm rounded border-start border-info border-4 text-start">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                        <span class="fw-bold fs-5">Ya postulaste a esta oferta</span>
+                                    </div>
+                                    <p class="mb-3 text-dark">Tu currículum está adjunto y en evaluación por parte de la empresa.</p>
+                                    
+                                    <form action="{% url 'jobs:despostular_a_oferta' oferta.id %}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas retirar tu postulación y eliminar tu CV de este cargo?');" class="d-grid">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger shadow-sm fw-bold">
+                                            ❌ Retirar Postulación
+                                        </button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <form action="{% url 'jobs:postular_oferta' oferta.id %}" method="POST" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light text-start">
+                                    {% csrf_token %}
+                                    <h5 class="fw-bold mb-3 text-secondary border-bottom pb-2">Postular a este cargo</h5>
+                                    
+                                    <div class="mb-4">
+                                        <label for="cv_archivo" class="form-label fw-bold">Adjunta tu Currículum Vitae (Obligatorio):</label>
+                                        <input type="file" name="cv_archivo" id="cv_archivo" class="form-control" accept=".pdf,.doc,.docx" required>
+                                        <div class="form-text mt-2"><small>Formatos permitidos: PDF o Word.</small></div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                                        ✉️ Enviar Postulación y CV
+                                    </button>
+                                </form>
+                            {% endif %}
+                            
+                        {% elif user.rol == 'empleador' %}
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                Las empresas no pueden postular a ofertas
+                            </button>
+                        {% endif %}
+                        
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg fw-bold">
+                            Inicia sesión como Candidato para postular
+                        </a>
+                    {% endif %}
+                </div>
 
             </div>
         </div>
