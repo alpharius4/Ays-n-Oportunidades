@@ -27,6 +27,7 @@
                                 <th>Empresa (Autor)</th>
                                 <th>Fecha de Postulación</th>
                                 <th>Estado</th>
+                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -45,6 +46,14 @@
                                     {% else %}
                                         <span class="badge bg-danger">Rechazado</span>
                                     {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <form action="{% url 'jobs:despostular_a_oferta' postulacion.oferta.id %}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas retirar tu postulación a este cargo?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm" title="Retirar Postulación">
+                                            ❌ Retirar
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             {% endfor %}

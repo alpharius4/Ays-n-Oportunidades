@@ -52,7 +52,16 @@ def lista_ofertas(request):
 def detalle_oferta(request, id):
     # Buscamos una oferta específica por su ID
     oferta = get_object_or_404(OfertaLaboral, id=id)
-    return render(request, 'jobs/detalle_oferta.html', {'oferta': oferta})
+    
+    # Verificamos si el usuario actual ya postuló a esta oferta
+    ya_postulado = False
+    if request.user.is_authenticated:
+        ya_postulado = Postulacion.objects.filter(oferta=oferta, candidato=request.user).exists()
+        
+    return render(request, 'jobs/detalle_oferta.html', {
+        'oferta': oferta,
+        'ya_postulado': ya_postulado  # Enviamos el estado al HTML
+    })
 
 
 # --------------------------------------------------------
@@ -261,3 +270,22 @@ def toggle_estado_oferta(request, oferta_id):
     # Cambia 'mis_ofertas' por el nombre de la vista donde el empleador ve sus publicaciones
     # Te devuelve a la página anterior. Si por algún motivo falla, te manda a tu dashboard por defecto.
     return redirect(request.META.get('HTTP_REFERER', '/accounts/dashboard/'))
+
+        # ====================================================================
+        # para que el candidato pueda quitar su postulacion a la oferta de trabajo
+        # ====================================================================
+
+@login_required
+def despostular_a_oferta(request, id):
+    oferta = get_object_or_404(OfertaLaboral, id=id)
+    
+    if request.method == 'POST':
+        postulacion = Postulacion.objects.filter(oferta=oferta, candidato=request.user)
+        
+        if postulacion.exists():
+            postulacion.delete()  # Elimina el registro de la postulación
+            messages.success(request, 'Has retirado tu postulación con éxito.')
+        else:
+            messages.error(request, 'No estás postulado a esta oferta.')
+            
+    return redirect(request.META.get('HTTP_REFERER', 'jobs:lista_ofertas'))
